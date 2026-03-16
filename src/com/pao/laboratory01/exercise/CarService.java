@@ -81,6 +81,18 @@ public class CarService {
      */
     public void addReview(String carName, String review) {
         // TODO: implementează aici
+        int i = 0;
+        for (i = 0; i < cars.length; i++) {
+            if (cars[i].getName().equals(carName)) {
+                String[] tmp = new String[cars[i].getReviews().length + 1];
+                System.arraycopy(cars[i].getReviews(), 0, tmp, 0, cars[i].getReviews().length);
+                tmp[tmp.length - 1] = review;
+                cars[i].setReviews(tmp);
+                System.out.println("Review-ul pentru masina " + cars[i].getName() + " a fost adaugat");
+                return;
+            }
+        }
+        System.out.println("Mașina nu a fost găsită.");
     }
 }
 

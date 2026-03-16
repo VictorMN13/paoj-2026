@@ -18,16 +18,27 @@ public class AngajatService {
 
     /** TODO: angajati.add(a); println("Angajat adăugat: " + a.getName()); */
     public void addAngajat(Angajat a) {
-        // TODO
+        angajati.add(a);
+        System.out.println("Angajat adăugat: " + a.getName());
     }
 
     /** TODO: dacă goală → mesaj; altfel parcurge cu index și afișează (i+1) + ". " + angajat */
     public void listAll() {
-        // TODO
+        if (angajati == null || angajati.isEmpty()) {
+            System.out.println("Nu exista angajati");
+            return;
+        }
+        for (int i = 0; i < angajati.size(); i++) {
+            System.out.println((i+1) + ". " + angajati.get(i));
+        }
     }
 
     /** TODO: parcurge lista, sumează a.salariuTotal(), returnează totalul. */
     public double totalSalarii() {
-        return 0; // TODO
+        double suma = 0;
+        for (int i = 0; i < angajati.size(); i++) {
+            suma += angajati.get(i).salariuTotal();
+        }
+        return suma;
     }
 }
