@@ -1,5 +1,15 @@
 package com.pao.laboratory03.bonus;
 
+import com.pao.laboratory03.bonus.exception.InvalidTransitionException;
+import com.pao.laboratory03.bonus.model.Priority;
+import com.pao.laboratory03.bonus.model.Status;
+import com.pao.laboratory03.bonus.model.Task;
+import com.pao.laboratory03.bonus.service.TaskService;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Exercițiul 5 (Bonus) — Sistem de gestiune task-uri cu audit log
  *
@@ -158,6 +168,53 @@ public class Main {
         // TODO: implementează toți cei 10 pași de mai sus
         // Creează TOATE clasele necesare în acest pachet (bonus/)
         // Nu ai subpachete impuse — organizează cum consideri
+        TaskService service = TaskService.getInstance();
+        service.addTask("Fix login bug", Priority.CRITICAL);
+        service.addTask("Add dark mode", Priority.LOW);
+        service.addTask("Update docs", Priority.MEDIUM);
+        service.addTask("Fix memory leak", Priority.HIGH);
+        service.addTask("Refactor DB layer", Priority.HIGH);
+
+        service.assignTask("T001", "Ana");
+        service.assignTask("T003", "Mihai");
+        service.assignTask("T004", "Elena");
+
+        service.changeStatus("T001", Status.IN_PROGRESS);
+        service.changeStatus("T001", Status.DONE);
+        service.changeStatus("T003", Status.IN_PROGRESS);
+        try {
+            service.changeStatus("T001", Status.TODO);
+        }
+        catch (InvalidTransitionException e) {
+            System.out.println(e.getMessage());
+        }
+
+        ArrayList<Task> list =new ArrayList<>(service.getTasksByPriority(Priority.HIGH));
+        for  (Task task : list) {
+            System.out.println(task);
+        }
+
+        HashMap<Status, Long> map = new HashMap<>(service.getStatusSummary());
+        for (Map.Entry<Status, Long> entry : map.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+
+        list = new ArrayList<>(service.getUnassignedTasks());
+        for  (Task task : list) {
+            System.out.println(task);
+        }
+
+        double scor = service.getTotalUrgencyScore(5);
+        System.out.println(scor);
+
+        service.printAuditLog();
+
+        try {
+            service.assignTask("T999", "Alfred");
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
 
