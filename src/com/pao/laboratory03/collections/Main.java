@@ -1,5 +1,7 @@
 package com.pao.laboratory03.collections;
 
+import java.util.*;
+
 /**
  * Exercițiul 1 — Colecții: HashMap și TreeMap
  *
@@ -51,6 +53,43 @@ package com.pao.laboratory03.collections;
 public class Main {
     public static void main(String[] args) {
         // TODO: implementează cele 3 părți de mai sus
+        // Partea A
+        // 1
+        String[] words = {"java", "python", "java", "c++", "python", "java", "rust", "c++", "go"};
+        // 2
+        HashMap<String, Integer> contor = new HashMap<>();
+        for (String word : words) {
+            contor.put(word, contor.getOrDefault(word, 0) + 1);
+        }
+        // 3
+        System.out.println("HashMap complet: " + contor);
+        // 4
+        System.out.println("Exista cheia 'rust': " + contor.containsKey("rust"));
+        // 5
+        System.out.println("Cheile din hashmap: " + contor.keySet());
+        System.out.println("Valorile din hashmap: " + contor.values());
+        // 6
+        System.out.println("Parcurgere cu entrySet:");
+        for (Map.Entry<String, Integer> entry: contor.entrySet()) {
+            System.out.println("  " + entry.getKey() + " -> " + entry.getValue());
+        }
+        // Partea B
+        // 7
+        TreeMap<String, Integer> cnt_sort =  new TreeMap<>(contor);
+        // 8
+        System.out.println("Map sortat: " + cnt_sort);
+        // 9
+        System.out.println("Prima cheie: " + cnt_sort.firstKey() + "; Ultima cheie: " + cnt_sort.lastKey());
+        // Partea 3
+        // 10
+        HashMap<String, List<String>> studenti = new HashMap<>();
+        studenti.put("PAOJ", studenti.getOrDefault("PAOJ", new ArrayList<>()));
+        Collections.addAll(studenti.get("PAOJ"), "Ana", "Mihai", "Ion");
+        // 11
+        System.out.println("Studenti PAOJ: " + studenti.get("PAOJ"));
+        // 12
+        studenti.put("BD", studenti.getOrDefault("BD", new ArrayList<>(Arrays.asList("Ana", "Elena", "George"))));
+        System.out.println("Studenti BD: " + studenti.get("BD"));
     }
 }
 
