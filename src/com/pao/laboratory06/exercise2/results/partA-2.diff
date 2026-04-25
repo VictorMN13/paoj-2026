@@ -1,0 +1,11 @@
+--- expected
++++ actual
+@@ -1,6 +1,6 @@
+-CIM: Test1 User1, venit net anual: 36300.00 lei
+-PFA: Test2 User2, venit net anual: 68040.00 lei
+ SRL: Test3 User3, venit net anual: 100800.00 lei
++PFA: Test2 User2, venit net anual: 68040.00 lei
++CIM: Test1 User1, venit net anual: 36300.00 lei
+ 
+ Colaborator cu venit net maxim: SRL: Test3 User3, venit net anual: 100800.00 lei
+ 

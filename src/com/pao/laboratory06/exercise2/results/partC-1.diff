@@ -1,0 +1,18 @@
+--- expected
++++ actual
+@@ -1,10 +1,8 @@
+ CIM: Bonus Test, venit net anual: 72600.00 lei
+-
+-Colaborator cu venit net maxim: CIM: Bonus Test, venit net anual: 72600.00 lei
+-
++Colaborator cu venit net maxim: 
++CIM: Bonus Test, venit net anual: 72600.00 lei
+ Colaboratori persoane juridice:
+-
+ Sume și număr colaboratori pe tip:
+-CIM: suma = 72600.00 lei, număr = 1
+-PFA: suma = nu lei, număr = null
+-SRL: suma = nu lei, număr = null
++CIM: suma = 72600.0 lei, numar = 1
++PFA: suma = 0.0 lei, numar = 0
++SRL: suma = 0.0 lei, numar = 0

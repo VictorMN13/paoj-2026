@@ -1,0 +1,15 @@
+--- expected
++++ actual
+@@ -1,9 +1,9 @@
++SRL: SRLTech SRL, venit net anual: 120960.00 lei
++PFA: Georgescu Maria, venit net anual: 78840.00 lei
+ CIM: Popescu Ana, venit net anual: 58080.00 lei
+ CIM: Ionescu Vlad, venit net anual: 46200.00 lei
+-PFA: Georgescu Maria, venit net anual: 78840.00 lei
+-PFA: Enache Paul, venit net anual: 8640.00 lei
+-SRL: SRLTech SRL, venit net anual: 120960.00 lei
+ SRL: MicroSRL SRL, venit net anual: 30240.00 lei
++PFA: Enache Paul, venit net anual: 8640.00 lei
+ 
+ Colaborator cu venit net maxim: SRL: SRLTech SRL, venit net anual: 120960.00 lei
+ 

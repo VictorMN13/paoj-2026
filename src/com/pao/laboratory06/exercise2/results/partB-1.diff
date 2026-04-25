@@ -1,0 +1,9 @@
+--- expected
++++ actual
+@@ -1,5 +1,5 @@
+-CIM: Ana Pop, venit net anual: 72600.00 lei
+ SRL: BigSRL SRL, venit net anual: 201600.00 lei
++CIM: Ana Pop, venit net anual: 72600.00 lei
+ 
+ Colaborator cu venit net maxim: SRL: BigSRL SRL, venit net anual: 201600.00 lei
+ 

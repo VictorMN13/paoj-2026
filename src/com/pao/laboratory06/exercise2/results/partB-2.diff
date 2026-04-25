@@ -1,0 +1,19 @@
+--- expected
++++ actual
+@@ -1,11 +1,9 @@
+ PFA: PF1 PFU, venit net anual: 14040.00 lei
+ PFA: PF2 PFU, venit net anual: -12960.00 lei
+-
+-Colaborator cu venit net maxim: PFA: PF1 PFU, venit net anual: 14040.00 lei
+-
++Colaborator cu venit net maxim: 
++PFA: PF1 PFU, venit net anual: 14040.00 lei
+ Colaboratori persoane juridice:
+-
+ Sume și număr colaboratori pe tip:
+-CIM: suma = nu lei, număr = null
+-PFA: suma = 1080.00 lei, număr = 2
+-SRL: suma = nu lei, număr = null
++CIM: suma = 0.0 lei, numar = 0
++PFA: suma = 1079.9999999999927 lei, numar = 2
++SRL: suma = 0.0 lei, numar = 0
