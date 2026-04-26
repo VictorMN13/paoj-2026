@@ -65,7 +65,7 @@ public class Main {
         System.out.print("Prenume: "); String prenume = scanner.nextLine();
         System.out.print("Email: "); String email = scanner.nextLine();
         System.out.print("Nr. telefon: "); String nr_telefon = scanner.nextLine();
-        System.out.println("Adresa: "); String adresa = scanner.nextLine();
+        System.out.print("Adresa: "); String adresa = scanner.nextLine();
         System.out.print("Alegeti o parola: "); String parola = scanner.nextLine();
 
         try {
@@ -117,8 +117,6 @@ public class Main {
                     case 1 -> contService.afiseazaConturiClient(email);
                     case 2 -> {
                         System.out.print("IBAN Sursa: "); ContBancar contS = alegeCont(email);
-                        if (contS == null)
-                            throw new ContException("Nu aveti nici un cont deschis");
                         String ibanS = contS.getIban();
 
                         System.out.print("IBAN Destinatie: "); String ibanD = scanner.nextLine();
@@ -146,7 +144,8 @@ public class Main {
                         }
                     }
                     case 5 -> {
-                        System.out.print("IBAN: "); String iban = scanner.nextLine();
+                        ContBancar cont = alegeCont(email);
+                        String iban =  cont.getIban();
                         System.out.print("Luni in urma (-1 pt tot istoric): "); int luni = Integer.parseInt(scanner.nextLine());
                         tranzactieService.afiseazaExtrasCont(iban, luni);
                     }
@@ -168,10 +167,11 @@ public class Main {
         boolean logat = true;
         while (logat) {
             System.out.println("\n--- TERMINAL ANGAJAT GHIȘEU ---");
-            System.out.println("1. Deschide cont nou (In constructie)");
+            System.out.println("1. Deschide cont nou");
             System.out.println("2. Inchide cont");
             System.out.println("3. Emite card nou");
             System.out.println("4. Blocare URGENTA carduri");
+            System.out.println("5. Cauta client si afiseaza dosarul");
             System.out.println("0. Delogare");
             System.out.print("Optiune: ");
 
@@ -225,6 +225,26 @@ public class Main {
                         System.out.print("IBAN cont compromis: "); String iban = scanner.nextLine();
                         contService.blocareDeUrgenta(iban);
                     }
+                    case 5 -> {
+                        System.out.println("\n--- CAUTARE DOSAR CLIENT ---");
+                        System.out.print("Introduceti email-ul cautat: ");
+                        String emailCautat = scanner.nextLine();
+                        User userGasit = userService.cautaUsrEmail(emailCautat);
+
+                        if (userGasit == null) {
+                            throw new UserException("Nu a fost gasit niciun utilizator cu un email asemanator.");
+                        }
+
+                        if (!(userGasit instanceof Client client)) {
+                            throw new UserException("Utilizatorul gasit (" + userGasit.getEmail() + ") nu face parte din categoria Clienti.");
+                        }
+
+                        System.out.println("\n[Sistem] Client gasit! (Match pe email: " + client.getEmail() + ")");
+                        System.out.println("--- DATE PERSONALE ---");
+                        System.out.println(client);
+                        System.out.println("\n--- SITUATIE FINANCIARA ---");
+                        contService.afiseazaConturiClient(client.getEmail());
+                    }
                     case 0 -> logat = false;
                     default -> System.out.println("Optiune invalida.");
                 }
@@ -241,6 +261,10 @@ public class Main {
             System.out.println("1. Raport Conturi TOP");
             System.out.println("2. Istoric Tranzactii Banca (Global)");
             System.out.println("3. Procesare Final de Luna (Dobanzi & Comisioane)");
+            System.out.println("4. Afiseaza lista tuturor utilizatorilor");
+            System.out.println("5. Afiseaza lista tuturor conturilor");
+            System.out.println("6. Promoveaza Angajat la Manager");
+            System.out.println("7. Sterge Utilizator din sistem");
             System.out.println("0. Delogare");
             System.out.print("Optiune: ");
 
@@ -256,6 +280,27 @@ public class Main {
                         tranzactieService.afiseazaTranzactiiBanca(luni);
                     }
                     case 3 -> contService.proceseazaFinalDeLuna();
+                    case 4 -> userService.afiseazaUsers();
+
+                    case 5 -> contService.afiseazaToateConturile();
+
+                    case 6 -> {
+                        System.out.print("Email angajat pentru promovare: "); String emailAngajat = scanner.nextLine();
+                        System.out.print("Numele noului departament: "); String departament = scanner.nextLine();
+                        System.out.print("Bonus de conducere (RON): "); double bonus = Double.parseDouble(scanner.nextLine());
+
+                        userService.promoveazaAngajat(emailAngajat, departament, bonus);
+                        System.out.println("[Sistem] Angajatul a fost promovat la functia de Manager cu succes!");
+                    }
+
+                    case 7 -> {
+                        System.out.print("Email utilizator de sters: "); String emailDeSters = scanner.nextLine();
+                        for (ContBancar c: contService.obtineConturiClient(emailDeSters)) {
+                            contService.stergeCont(c.getIban());
+                        }
+                        userService.stergeUser(emailDeSters);
+                        System.out.println("[Sistem] Utilizatorul a fost sters din baza de date.");
+                    }
                     case 0 -> logat = false;
                     default -> System.out.println("Optiune invalida.");
                 }
@@ -275,18 +320,17 @@ public class Main {
         }
     }
 
-    private static ContBancar alegeCont(String email) {
+    private static ContBancar alegeCont(String email) throws ContException {
         List<ContBancar> lista = contService.obtineConturiClient(email);
 
         if (lista.isEmpty()) {
-            return null;
+            throw new ContException("Clientul " + email + " nu are niciun cont deschis in acest moment.");
         }
 
         System.out.println("\n--- CONTURILE DVS. ---");
         for (int i = 0; i < lista.size(); i++) {
             ContBancar c = lista.get(i);
-            System.out.printf("%d. %s | Sold: %.2f %s\n",
-                    (i + 1), c.getIban(), c.getSold(), c.getMoneda());
+            System.out.println((i + 1) + ". " + c);
         }
 
         System.out.print("Selectati numarul contului: ");
@@ -299,7 +343,6 @@ public class Main {
             gestioneazaEroare(e);
         }
 
-        System.out.println("[Eroare] Selectie invalida.");
-        return null;
+        throw new ContException("Eroare la selectia contului");
     }
 }

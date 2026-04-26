@@ -182,11 +182,10 @@ public class ContService {
                 .toList();
     }
 
-    public void afiseazaConturiClient(String emailClient) {
+    public void afiseazaConturiClient(String emailClient) throws ContException {
         List<ContBancar> conturiClient = obtineConturiClient(emailClient);
         if (conturiClient.isEmpty()) {
-            System.out.println("Clientul " + emailClient + " nu are niciun cont deschis in acest moment.");
-            return;
+            throw new ContException("Clientul " + emailClient + " nu are niciun cont deschis in acest moment.");
         }
 
         System.out.println("=== CONTURILE CLIENTULUI: " + emailClient + " ===");
