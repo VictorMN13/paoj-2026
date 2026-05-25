@@ -133,11 +133,11 @@ public class SchemaInitializer {
         String schemaFile;
 
         if (url.contains("mysql")) {
-            schemaFile = "schema-mysql.sql";
+            schemaFile = "schema.sql";
         } else if (url.contains("sqlite")) {
             schemaFile = "schema-sqlite.sql";
         } else {
-            schemaFile = "schema-mysql.sql";  // H2 e compatibil MySQL
+            schemaFile = "schema.sql";  // H2 e compatibil MySQL
         }
 
         // Citim fisierul din resources/ (classpath)

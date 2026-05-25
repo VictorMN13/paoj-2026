@@ -82,7 +82,7 @@ CREATE TABLE loan (
 
 > **Pentru MySQL**: înlocuiește `INTEGER PRIMARY KEY AUTOINCREMENT` cu `BIGINT AUTO_INCREMENT PRIMARY KEY`
 > și adaugă `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;` la sfârșitul fiecărui `CREATE TABLE`.
-> Fișierele separate `schema-mysql.sql` și `schema-sqlite.sql` din `resources/` sunt gata de folosit.
+> Fișierele separate `schema.sql` și `schema-sqlite.sql` din `resources/` sunt gata de folosit.
 
 ---
 

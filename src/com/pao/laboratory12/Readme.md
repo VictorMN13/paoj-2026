@@ -35,7 +35,7 @@ laboratory12/
 ├── exercise3/                  ← BONUS
 │   └── Readme.md               ← MySQL vs SQLite vs H2, checklist proiect-ready
 └── resources/
-    ├── schema-mysql.sql        ← template schema MySQL (copy-paste în proiect)
+    ├── schema.sql        ← template schema MySQL (copy-paste în proiect)
     ├── schema-sqlite.sql       ← template schema SQLite (copy-paste în proiect)
     └── db.properties.template  ← template configurare conexiune
 ```
@@ -66,7 +66,7 @@ Schema respectă cerința de **≥2 FOREIGN KEY** din barem.
    ```sql
    CREATE DATABASE IF NOT EXISTS paoj_lab12 CHARACTER SET utf8mb4;
    ```
-3. Rulează `resources/schema-mysql.sql` pe baza `paoj_lab12`.
+3. Rulează `resources/schema.sql` pe baza `paoj_lab12`.
 4. Copiază `resources/db.properties.template` → `resources/db.properties` și completează credențialele.
 5. Adaugă driverul MySQL JDBC în classpath (IntelliJ: `File → Project Structure → Modules → Dependencies → + JAR`):
    - Descarcă de la: https://dev.mysql.com/downloads/connector/j/

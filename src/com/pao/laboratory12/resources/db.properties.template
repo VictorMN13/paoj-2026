@@ -16,7 +16,7 @@
 # Creeaza baza de date inainte:
 #   CREATE DATABASE IF NOT EXISTS paoj_lab12 CHARACTER SET utf8mb4;
 # Ruleaza schema:
-#   mysql -u root -p paoj_lab12 < resources/schema-mysql.sql
+#   mysql -u root -p paoj_lab12 < resources/schema.sql
 # -------------------------------------------------------
 db.url=jdbc:mysql://localhost:3306/paoj_lab12?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 db.user=root
@@ -41,7 +41,7 @@ db.password=parola_ta
 # -------------------------------------------------------
 # Schema trebuie rulata la fiecare pornire a aplicatiei
 #   (foloseste SchemaInitializer.init(conn) in Main).
-# H2 e compatibil MySQL => foloseste schema-mysql.sql.
+# H2 e compatibil MySQL => foloseste schema.sql.
 # -------------------------------------------------------
 # db.url=jdbc:h2:mem:lab12;DB_CLOSE_DELAY=-1;MODE=MySQL
 # db.user=sa
