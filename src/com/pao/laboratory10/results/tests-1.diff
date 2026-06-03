@@ -1,0 +1,7 @@
+--- expected
++++ actual
+@@ -2,3 +2,4 @@
+ [2] 2024-01-22 DEBIT: 750.50 RON
+ [4] 2024-02-18 DEBIT: 1200.00 RON
+ [1] 2024-01-15 CREDIT: 1500.00 RON
++TODO: implementează exercițiul 2

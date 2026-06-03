@@ -1,0 +1,9 @@
+--- expected
++++ actual
+@@ -1,5 +1,5 @@
+ OK AUTH user=a
+ OK OPEN
+-ERR E_STATE ALREADY_OPEN
++ERR E_STATE ALREADY_OPEN;
+ OK CLOSED
+ ERR E_STATE CLOSED

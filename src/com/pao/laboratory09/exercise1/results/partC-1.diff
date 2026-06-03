@@ -1,0 +1,7 @@
+--- expected
++++ actual
+@@ -1,2 +1,2 @@
+-NOTE[1]: null
+-NOTE[2]: null
++NOTE[1]: not found
++NOTE[2]: not found

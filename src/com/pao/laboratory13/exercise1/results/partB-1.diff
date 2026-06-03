@@ -1,0 +1,10 @@
+--- expected
++++ actual
+@@ -1,4 +1,5 @@
+-ERR E_STATE NOT_OPEN
++ERR E_PARSE SEND
+ OK AUTH user=ana
+-ERR E_STATE NOT_OPEN
++ERR E_PARSE SEND
+ OK OPEN
++TODO: implement laboratory13 exercise1

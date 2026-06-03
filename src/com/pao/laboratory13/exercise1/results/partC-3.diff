@@ -1,0 +1,8 @@
+--- expected
++++ actual
+@@ -4,4 +4,4 @@
+ OK AUTH user=b
+ OK OPEN
+ OK OPEN history=0
+-OK CLOSED
++ERR E_PARSE CLOSE

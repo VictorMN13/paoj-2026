@@ -1,0 +1,11 @@
+--- expected
++++ actual
+@@ -1,5 +1,5 @@
+ OK AUTH user=z
+ OK OPEN
+-OK CLOSED
+-ERR E_STATE CLOSED
+-ERR E_STATE CLOSED
++ERR E_PARSE CLOSE
++OK OPEN broadcast
++ERR E_PARSE CLOSE

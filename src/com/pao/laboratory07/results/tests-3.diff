@@ -1,0 +1,8 @@
+--- expected
++++ actual
+@@ -1,4 +1,4 @@
+-GIFT: Postcard, gratuit [PLACED]
++ComandaGratuita
+ 
+ Statistici:
+ GIFT: suma = 0.00 lei, numar = 1

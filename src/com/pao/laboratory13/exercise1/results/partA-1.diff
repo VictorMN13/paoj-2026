@@ -1,0 +1,8 @@
+--- expected
++++ actual
+@@ -2,4 +2,4 @@
+ OK OPEN
+ OK OPEN sent
+ OK OPEN broadcast
+-OK CLOSED
++ERR E_PARSE CLOSE

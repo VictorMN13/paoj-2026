@@ -1,0 +1,8 @@
+--- expected
++++ actual
+@@ -2,4 +2,4 @@
+ [3] 2024-02-01 CREDIT: 100.00 RON
+ Extras: [4] 2024-02-05 DEBIT: 250.00 RON
+ Extras: [3] 2024-02-01 CREDIT: 100.00 RON
+-Coada goala.
++Coada goala

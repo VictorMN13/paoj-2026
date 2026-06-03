@@ -1,0 +1,8 @@
+--- expected
++++ actual
+@@ -3,4 +3,4 @@
+ OK OPEN sent
+ OK OPEN broadcast
+ OK OPEN history=2
+-OK CLOSED
++ERR E_PARSE CLOSE

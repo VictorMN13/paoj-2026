@@ -1,0 +1,10 @@
+--- expected
++++ actual
+@@ -1,5 +1,6 @@
+ OK AUTH user=alice
+ OK OPEN
+ OK AUTH user=bob
+-ERR E_STATE NOT_OPEN
++ERR E_PARSE SEND
+ OK OPEN
++TODO: implement laboratory13 exercise1
