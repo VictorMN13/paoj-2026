@@ -17,6 +17,14 @@ public abstract class User {
         this.parola = parola;
     }
 
+    public User(String id,String nume, String prenume, String email, String parola) {
+        this.id = id.toUpperCase();
+        this.nume = nume;
+        this.prenume = prenume;
+        this.email = email;
+        this.parola = parola;
+    }
+
     public abstract String getRol();
 
     public String getId() {

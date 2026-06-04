@@ -7,6 +7,7 @@ import com.pao.proiect.bank_app.model.*;
 import com.pao.proiect.bank_app.service.ContService;
 import com.pao.proiect.bank_app.service.TranzactieService;
 import com.pao.proiect.bank_app.service.UserService;
+import com.pao.proiect.bank_app.service.AuditService;
 
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +19,7 @@ public class Main {
     private static final ContService contService = ContService.getInstance();
     private static final TranzactieService tranzactieService = TranzactieService.getInstance();
     private static final UserService userService = UserService.getInstance();
+    private static final AuditService auditService = AuditService.getInstance();
 
     public static void main(String[] args) {
         try {
@@ -73,6 +75,8 @@ public class Main {
         try {
             Client clientNou = new Client(nume, prenume, email, parola, adresa, nr_telefon);
             userService.adaugaUser(clientNou);
+
+            auditService.log("inregistrare_client");
             System.out.println("[Sistem] Cont de utilizator creat cu succes! Va puteti autentifica.");
         } catch (Exception e) {
             System.out.println("[Eroare] " + e.getMessage());
@@ -87,6 +91,8 @@ public class Main {
 
         if (userService.login(email, parola)) {
             User userCurent = userService.getLoggedUsr();
+            auditService.log("login_utilizator");
+
             if (userCurent instanceof Manager) {
                 meniuManager();
             } else if (userCurent instanceof Angajat) {
@@ -97,6 +103,7 @@ public class Main {
 
             userService.logout();
             System.out.println("[Sistem] Delogare cu succes.");
+            auditService.log("logout_utilizator");
         }
     }
 
@@ -116,14 +123,18 @@ public class Main {
             try {
                 int opt = Integer.parseInt(scanner.nextLine());
                 switch (opt) {
-                    case 1 -> contService.afiseazaConturiClient(email);
+                    case 1 -> {
+                        contService.afiseazaConturiClient(email);
+                        auditService.log("afisare_conturi_client");
+                    }
                     case 2 -> {
                         System.out.print("IBAN Sursa: "); ContBancar contS = alegeCont(email);
                         String ibanS = contS.getIban();
-
+                        tranzactieService.afiseazaContacteFrecvente(ibanS);
                         System.out.print("IBAN Destinatie: "); String ibanD = scanner.nextLine();
                         System.out.print("Suma: "); double suma = Double.parseDouble(scanner.nextLine());
                         tranzactieService.realizeazaTransfer(ibanS, ibanD, suma);
+                        auditService.log("transfer_bancar");
                     }
                     case 3 -> {
                         ContBancar contSelectat = alegeCont(email);
@@ -133,6 +144,7 @@ public class Main {
 
                             tranzactieService.realizeazaDepunere(contSelectat.getIban(), suma);
                             System.out.println("[Sistem] Depunere efectuata cu succes!");
+                            auditService.log("depunere_numerar");
                         }
                     }
                     case 4 -> {
@@ -143,6 +155,7 @@ public class Main {
 
                             tranzactieService.realizeazaRetragere(contSelectat.getIban(), suma);
                             System.out.println("[Sistem] Retragere efectuata cu succes!");
+                            auditService.log("retragere_numerar");
                         }
                     }
                     case 5 -> {
@@ -150,11 +163,13 @@ public class Main {
                         String iban =  cont.getIban();
                         System.out.print("Luni in urma (-1 pt tot istoric): "); int luni = Integer.parseInt(scanner.nextLine());
                         tranzactieService.afiseazaExtrasCont(iban, luni);
+                        auditService.log("generare_extras_cont");
                     }
                     case 6 -> {
                         System.out.print("Moneda referinta (ex: RON, EUR): "); String moneda = scanner.nextLine();
                         double avere = contService.calculeazaAvereClient(email, moneda);
                         System.out.printf("Avere totala consolidata: %.2f %s\n", avere, moneda.toUpperCase());
+                        auditService.log("calcul_avere_client");
                     }
                     case 0 -> logat = false;
                     default -> System.out.println("Optiune invalida.");
@@ -213,19 +228,23 @@ public class Main {
                         System.out.println("[Sistem] Cont deschis cu succes!");
                         System.out.println("[Detalii] IBAN generat automat: " + ibanNou);
                         System.out.println("============================================");
+                        auditService.log("deschidere_cont_nou");
                     }
                     case 2 -> {
                         System.out.print("IBAN de inchis: "); String iban = scanner.nextLine();
                         contService.stergeCont(iban);
                         System.out.println("Cont sters cu succes din sistem.");
+                        auditService.log("inchidere_cont");
                     }
                     case 3 -> {
                         System.out.print("IBAN cont curent: "); String iban = scanner.nextLine();
                         contService.emiteCardCont(iban);
+                        auditService.log("emitere_card");
                     }
                     case 4 -> {
                         System.out.print("IBAN cont compromis: "); String iban = scanner.nextLine();
                         contService.blocareDeUrgenta(iban);
+                        auditService.log("blocare_card_urgenta");
                     }
                     case 5 -> {
                         System.out.println("\n--- CAUTARE DOSAR CLIENT ---");
@@ -246,6 +265,7 @@ public class Main {
                         System.out.println(client);
                         System.out.println("\n--- SITUATIE FINANCIARA ---");
                         contService.afiseazaConturiClient(client.getEmail());
+                        auditService.log("cautare_dosar_client");
                     }
                     case 0 -> logat = false;
                     default -> System.out.println("Optiune invalida.");
@@ -267,6 +287,8 @@ public class Main {
             System.out.println("5. Afiseaza lista tuturor conturilor");
             System.out.println("6. Promoveaza Angajat la Manager");
             System.out.println("7. Sterge Utilizator din sistem");
+            System.out.println("8. Raport: Top 5 Clienti (dupa volumul de transferuri)");
+            System.out.println("9. Extras de Cont (pentru orice IBAN)");
             System.out.println("0. Delogare");
             System.out.print("Optiune: ");
 
@@ -276,15 +298,26 @@ public class Main {
                     case 1 -> {
                         System.out.print("Prag minim RON: "); double prag = Double.parseDouble(scanner.nextLine());
                         contService.afiseazaRaportTopFonduri(prag);
+                        auditService.log("raport_conturi_top");
                     }
                     case 2 -> {
                         System.out.print("Luni in urma (-1 pt tot istoric): "); int luni = Integer.parseInt(scanner.nextLine());
                         tranzactieService.afiseazaTranzactiiBanca(luni);
+                        auditService.log("istoric_tranzactii_global");
                     }
-                    case 3 -> contService.proceseazaFinalDeLuna();
-                    case 4 -> userService.afiseazaUsers();
+                    case 3 -> {
+                        contService.proceseazaFinalDeLuna();
+                        auditService.log("procesare_final_de_luna");
+                    }
+                    case 4 -> {
+                        userService.afiseazaUsers();
+                        auditService.log("afisare_toti_utilizatorii");
+                    }
 
-                    case 5 -> contService.afiseazaToateConturile();
+                    case 5 -> {
+                        contService.afiseazaToateConturile();
+                        auditService.log("afisare_toate_conturile");
+                    }
 
                     case 6 -> {
                         System.out.print("Email angajat pentru promovare: "); String emailAngajat = scanner.nextLine();
@@ -293,15 +326,27 @@ public class Main {
 
                         userService.promoveazaAngajat(emailAngajat, departament, bonus);
                         System.out.println("[Sistem] Angajatul a fost promovat la functia de Manager cu succes!");
+                        auditService.log("promovare_angajat");
                     }
 
                     case 7 -> {
                         System.out.print("Email utilizator de sters: "); String emailDeSters = scanner.nextLine();
-                        for (ContBancar c: contService.obtineConturiClient(emailDeSters)) {
-                            contService.stergeCont(c.getIban());
-                        }
                         userService.stergeUser(emailDeSters);
                         System.out.println("[Sistem] Utilizatorul a fost sters din baza de date.");
+                        auditService.log("stergere_utilizator");
+                    }
+                    case 8 -> {
+                        contService.afiseazaTopClienti();
+                        auditService.log("raport_top_clienti");
+                    }
+                    case 9 -> {
+                        System.out.println("\n--- AUDIT: EXTRAS DE CONT ---");
+                        System.out.print("Introdu IBAN-ul contului pentru verificare: ");
+                        String ibanExtras = scanner.nextLine();
+                        System.out.print("Luni in urma (-1 pt tot istoric): ");
+                        int luni = Integer.parseInt(scanner.nextLine());
+                        tranzactieService.afiseazaExtrasCont(ibanExtras, luni);
+                        auditService.log("audit_extras_cont");
                     }
                     case 0 -> logat = false;
                     default -> System.out.println("Optiune invalida.");

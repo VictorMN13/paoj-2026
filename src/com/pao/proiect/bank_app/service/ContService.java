@@ -5,17 +5,25 @@ import com.pao.proiect.bank_app.exception.ContException;
 import com.pao.proiect.bank_app.exception.ContInexistentException;
 import com.pao.proiect.bank_app.exception.FonduriInsuficienteException;
 import com.pao.proiect.bank_app.model.*;
+import com.pao.proiect.bank_app.repository.CardRepository;
+import com.pao.proiect.bank_app.repository.ContBancarRepository;
+import com.pao.proiect.bank_app.util.DatabaseConnection;
 
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class ContService {
-    private final List<ContBancar> conturi;
+    private final ContBancarRepository contRepo;
+    private final CardRepository cardRepo;
 
     private ContService() {
-        this.conturi = new ArrayList<>();
+        this.contRepo = new ContBancarRepository();
+        this.cardRepo = new CardRepository();
     }
 
     private static class Holder {
@@ -30,7 +38,11 @@ public class ContService {
         if (cautaContIban(cont.getIban()) != null) {
             throw new ContException("Eroare: Un cont cu IBAN-ul " + cont.getIban() + " exista deja in sistem!");
         }
-        conturi.add(cont);
+        try {
+            contRepo.save(cont);
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
+        }
     }
 
     public void stergeCont(String iban) throws ContInexistentException {
@@ -38,26 +50,35 @@ public class ContService {
         if (cont == null) {
             throw new ContInexistentException(iban, true);
         }
-        conturi.remove(cont);
+        try {
+            contRepo.delete(iban);
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
+        }
     }
 
     public ContBancar cautaContIban(String iban) {
-        for (ContBancar c : conturi) {
-            if (c.getIban().equals(iban)) {
-                return c;
-            }
+        try {
+            return contRepo.findById(iban).orElse(null);
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
+            return null;
         }
-        return null;
     }
 
     public void afiseazaToateConturile() {
         System.out.println("=== LISTA TUTUROR CONTURILOR ===");
-        if (conturi.isEmpty()) {
-            System.out.println("Banca nu are niciun cont deschis in acest moment.");
-        } else {
-            for (ContBancar cont : conturi) {
-                System.out.println(cont.toString());
+        try {
+            List<ContBancar> conturi = contRepo.findAll();
+            if (conturi.isEmpty()) {
+                System.out.println("Banca nu are niciun cont deschis in acest moment.");
+            } else {
+                for (ContBancar cont : conturi) {
+                    System.out.println(cont.toString());
+                }
             }
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
         }
         System.out.println("================================");
     }
@@ -81,6 +102,12 @@ public class ContService {
         Card cardNou = new Card(numarCard, iban, cvv, pin, false);
         contCurent.adaugaCard(cardNou);
 
+        try {
+            cardRepo.save(cardNou);
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
+        }
+
         System.out.println("[Sistem] Card emis cu succes! Numar: " + numarCard + " | PIN: " + pin + " | Asociat contului: " + iban);
     }
 
@@ -88,19 +115,26 @@ public class ContService {
         System.out.println("[Sistem] Se ruleaza procesarea de final de luna...");
         int cntProc = 0;
 
-        for (ContBancar cont : conturi) {
-            if (cont instanceof ContEconomii contEconomii) {
-                contEconomii.aplicaDobanda();
-                cntProc++;
-            }
-            else if (cont instanceof ContCurent contCurent) {
-                try {
-                    contCurent.platesteComAdmin();
+        try {
+            List<ContBancar> conturi = contRepo.findAll();
+            for (ContBancar cont : conturi) {
+                if (cont instanceof ContEconomii contEconomii) {
+                    contEconomii.aplicaDobanda();
+                    contRepo.update(contEconomii);
                     cntProc++;
-                } catch (FonduriInsuficienteException e) {
-                    System.out.println("[Atentie] Contul " + contCurent.getIban() + " nu are fonduri pentru plata comisionului de administrare!");
+                }
+                else if (cont instanceof ContCurent contCurent) {
+                    try {
+                        contCurent.platesteComAdmin();
+                        contRepo.update(contCurent);
+                        cntProc++;
+                    } catch (FonduriInsuficienteException e) {
+                        System.out.println("[Atentie] Contul " + contCurent.getIban() + " nu are fonduri pentru plata comisionului de administrare!");
+                    }
                 }
             }
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
         }
         System.out.println("[Sistem] Procesare finalizata. Au fost actualizate " + cntProc + " conturi.");
     }
@@ -112,16 +146,28 @@ public class ContService {
         }
 
         if (cont instanceof ContCurent contCurent) {
-            List<Card> carduri = contCurent.getCarduriAtasate();
-            if (carduri.isEmpty()) {
-                System.out.println("[Sistem] Contul curent nu are niciun card atasat de blocat.");
-                return;
-            }
+            try {
+                List<Card> toateCardurile = cardRepo.findAll();
+                List<Card> carduri = new ArrayList<>();
+                for (Card c : toateCardurile) {
+                    if (c.getIbanAsociat().equals(iban)) {
+                        carduri.add(c);
+                    }
+                }
 
-            for (Card c : carduri) {
-                c.setBlocat(true);
+                if (carduri.isEmpty()) {
+                    System.out.println("[Sistem] Contul curent nu are niciun card atasat de blocat.");
+                    return;
+                }
+
+                for (Card c : carduri) {
+                    c.setBlocat(true);
+                    cardRepo.update(c);
+                }
+                System.out.println("[Securitate - Alerta] Au fost blocate " + carduri.size() + " carduri pentru IBAN-ul " + iban);
+            } catch (SQLException e) {
+                System.err.println("Eroare la baza de date: " + e.getMessage());
             }
-            System.out.println("[Securitate - Alerta] Au fost blocate " + carduri.size() + " carduri pentru IBAN-ul " + iban);
         } else {
             System.out.println("[Sistem] Acesta este un cont de economii. Nu detine carduri ce pot fi blocate.");
         }
@@ -130,32 +176,48 @@ public class ContService {
     public double calculeazaAvereClient(String emailClient, String moneda) throws IllegalArgumentException{
         double avere = 0;
         moneda = moneda.toUpperCase();
-        for (ContBancar cont : conturi) {
-            if (cont.getTitular().getEmail().equals(emailClient)) {
-                avere += cont.getMoneda().getCursFataDeRon() * cont.getSold();
+        try {
+            List<ContBancar> conturi = contRepo.findAll();
+            for (ContBancar cont : conturi) {
+                if (cont.getTitular().getEmail().equals(emailClient)) {
+                    avere += cont.getMoneda().getCursFataDeRon() * cont.getSold();
+                }
             }
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
         }
         return Moneda.RON.convertesteIn(avere, Moneda.valueOf(moneda));
     }
 
     public List<ContBancar> obtineConturiEligibile(double pragMinimRon) {
-        if (conturi.isEmpty()) {
+        try {
+            List<ContBancar> conturi = contRepo.findAll();
+            if (conturi.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            return conturi.stream()
+                    .filter(cont -> (cont.getMoneda().getCursFataDeRon() * cont.getSold()) >= pragMinimRon)
+                    .sorted(new SoldDescComparator())
+                    .toList();
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
             return new ArrayList<>();
         }
-
-        return conturi.stream()
-                .filter(cont -> (cont.getMoneda().getCursFataDeRon() * cont.getSold()) >= pragMinimRon)
-                .sorted(new SoldDescComparator())
-                .toList();
     }
 
     public void afiseazaRaportTopFonduri(double pragMinimRon) {
         System.out.println("=== RAPORT MANAGEMENT: CONTURI ELIGIBILE OFERTE SPECIALE (Valoare > " + pragMinimRon + " RON) ===");
 
-        if (conturi.isEmpty()) {
-            System.out.println("Nu exista conturi inregistrate in sistem.");
-            System.out.println("===========================================================================================");
-            return;
+        try {
+            List<ContBancar> conturi = contRepo.findAll();
+            if (conturi.isEmpty()) {
+                System.out.println("Nu exista conturi inregistrate in sistem.");
+                System.out.println("===========================================================================================");
+                return;
+            }
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
         }
 
         List<ContBancar> conturiFiltrate = obtineConturiEligibile(pragMinimRon);
@@ -177,9 +239,15 @@ public class ContService {
             return new ArrayList<>();
         }
 
-        return conturi.stream()
-                .filter(cont -> cont.getTitular().getEmail().equalsIgnoreCase(emailClient))
-                .toList();
+        try {
+            List<ContBancar> conturi = contRepo.findAll();
+            return conturi.stream()
+                    .filter(cont -> cont.getTitular().getEmail().equalsIgnoreCase(emailClient))
+                    .toList();
+        } catch (SQLException e) {
+            System.err.println("Eroare la baza de date: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     public void afiseazaConturiClient(String emailClient) throws ContException {
@@ -193,6 +261,53 @@ public class ContService {
             System.out.println(cont);
         }
         System.out.println("==================================================");
+    }
+
+    public List<String> obtineTopClientiTransferuri() {
+        List<String> topClienti = new ArrayList<>();
+        String sql = """
+            SELECT u.nume, u.prenume, COUNT(t.id) AS numar_transferuri, SUM(t.suma) AS volum_total
+            FROM client u
+            JOIN cont_bancar cb ON u.id = cb.client_id
+            JOIN tranzactie t ON cb.iban = t.iban_sursa
+            WHERE t.tip = 'TRANSFER'
+            GROUP BY u.id, u.nume, u.prenume
+            ORDER BY volum_total DESC
+            LIMIT 5
+            """;
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            int loc = 1;
+            while (rs.next()) {
+                String numeComplet = rs.getString("nume") + " " + rs.getString("prenume");
+                int nrTranzactii = rs.getInt("numar_transferuri");
+                double volum = rs.getDouble("volum_total");
+
+                String format = String.format("%d. %-25s | %d transferuri | Total trimis: %.2f RON",
+                        loc++, numeComplet, nrTranzactii, volum);
+                topClienti.add(format);
+            }
+        } catch (Exception e) {
+            System.err.println("Eroare la generarea topului: " + e.getMessage());
+        }
+
+        return topClienti;
+    }
+
+    public void afiseazaTopClienti() {
+        System.out.println("\n=== TOP 5 CLIENTI (DUPA VOLUMUL TRANSFERURILOR) ===");
+        List<String> top = obtineTopClientiTransferuri();
+        if (top.isEmpty()) {
+            System.out.println("Nu exista suficiente date pentru a genera topul.");
+        } else {
+            for (String linie : top) {
+                System.out.println(linie);
+            }
+        }
+        System.out.println("===================================================\n");
     }
 
     public String genereazaIbanAutomat() {

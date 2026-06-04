@@ -10,6 +10,12 @@ public class Client extends User{
         this.numarTelefon = numarTelefon;
     }
 
+    public Client(String id, String nume, String prenume, String email, String parola, String adresa, String numarTelefon) {
+        super(id, nume, prenume, email, parola);
+        this.adresa = adresa;
+        this.numarTelefon = numarTelefon;
+    }
+
     public String getAdresa() {
         return adresa;
     }

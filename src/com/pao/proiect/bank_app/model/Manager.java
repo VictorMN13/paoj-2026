@@ -10,6 +10,12 @@ public class Manager extends Angajat{
         this.departament = departament;
     }
 
+    public Manager(String id, String nume, String prenume, String email, String parola, double salariu, String sucursala, double bonusConducere, String departament) {
+        super(id, nume, prenume, email, parola, salariu, sucursala);
+        this.bonusConducere = bonusConducere;
+        this.departament = departament;
+    }
+
     @Override
     public String getRol() {
         return "Manager";

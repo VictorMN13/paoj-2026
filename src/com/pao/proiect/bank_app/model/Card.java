@@ -19,6 +19,15 @@ public class Card {
         this.blocat = blocat;
     }
 
+    public Card(String numarCard, String ibanAsociat, String cvv, LocalDate dataExpirare, String pin, boolean blocat) {
+        this.numarCard = numarCard;
+        this.ibanAsociat = ibanAsociat;
+        this.cvv = cvv;
+        this.dataExpirare = dataExpirare;
+        this.pin = pin;
+        this.blocat = blocat;
+    }
+
     public String getNumarCard() {
         return numarCard;
     }

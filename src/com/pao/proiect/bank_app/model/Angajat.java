@@ -10,6 +10,12 @@ public class Angajat extends  User{
         this.sucursala = sucursala;
     }
 
+    public Angajat(String id, String nume, String prenume, String email, String parola, double salariu, String sucursala) {
+        super(id, nume, prenume, email, parola);
+        this.salariu = salariu;
+        this.sucursala = sucursala;
+    }
+
     @Override
     public String getRol() {
         return "Angajat";
