@@ -13,9 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class ContService {
     private final ContBancarRepository contRepo;
@@ -67,20 +65,33 @@ public class ContService {
     }
 
     public void afiseazaToateConturile() {
-        System.out.println("=== LISTA TUTUROR CONTURILOR ===");
+        System.out.println("\n=== TOATE CONTURILE (GRUPATE PE MONEDA) ===");
         try {
-            List<ContBancar> conturi = contRepo.findAll();
-            if (conturi.isEmpty()) {
-                System.out.println("Banca nu are niciun cont deschis in acest moment.");
-            } else {
-                for (ContBancar cont : conturi) {
-                    System.out.println(cont.toString());
+            List<ContBancar> toateConturile = contRepo.findAll();
+
+            if (toateConturile.isEmpty()) {
+                System.out.println("Nu exista conturi deschise in banca.");
+                return;
+            }
+            Map<String, List<ContBancar>> conturiGrupate = new HashMap<>();
+
+            for (ContBancar cont : toateConturile) {
+                String moneda = cont.getMoneda().toString();
+                conturiGrupate.putIfAbsent(moneda, new ArrayList<>());
+                conturiGrupate.get(moneda).add(cont);
+            }
+
+            for (Map.Entry<String, List<ContBancar>> intrare : conturiGrupate.entrySet()) {
+                System.out.println("\n--- Moneda: " + intrare.getKey() + " ---");
+                for (ContBancar cont : intrare.getValue()) {
+                    System.out.println("  " + cont.toString());
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Eroare la baza de date: " + e.getMessage());
+
+        } catch (Exception e) {
+            System.err.println("Eroare la incarcarea conturilor: " + e.getMessage());
         }
-        System.out.println("================================");
+        System.out.println("===========================================\n");
     }
 
     public void emiteCardCont(String iban) throws BancaException {
