@@ -22,18 +22,18 @@ public class Main {
     private static final AuditService auditService = AuditService.getInstance();
 
     public static void main(String[] args) {
-        try {
-            Manager admin = new Manager("Sef", "Sefulescu", "admin@banca.ro", "admin123", 10000, "Centrala", 2000, "Conducere");
-            Angajat ghiseu = new Angajat( "Popa", "Ion", "angajat@banca.ro", "angajat123", 4000, "Sucursala 1");
-            Client client = new Client("Victor", "victor","victor@gmail.com", "123", "acasa", "00000000");
-
-            userService.adaugaUser(admin);
-            userService.adaugaUser(ghiseu);
-            userService.adaugaUser(client);
-        } catch (
-                UserException e) {
-            System.out.println("Eroare la incarcarea angajatilor de test: " + e.getMessage());
-        }
+//        try {
+//            Manager admin = new Manager("Sef", "Sefulescu", "admin@banca.ro", "admin123", 10000, "Centrala", 2000, "Conducere");
+//            Angajat ghiseu = new Angajat( "Popa", "Ion", "angajat@banca.ro", "angajat123", 4000, "Sucursala 1");
+//            Client client = new Client("Victor", "victor","victor@gmail.com", "123", "acasa", "00000000");
+//
+//            userService.adaugaUser(admin);
+//            userService.adaugaUser(ghiseu);
+//            userService.adaugaUser(client);
+//        } catch (
+//                UserException e) {
+//            System.out.println("Eroare la incarcarea angajatilor de test: " + e.getMessage());
+//        }
 
         boolean ruleaza = true;
         while (ruleaza) {

@@ -160,7 +160,7 @@ public class TranzactieService {
         List<String> extras = new ArrayList<>();
 
         String sql = """
-            SELECT t.timestamp, t.tip, t.suma, 
+            SELECT t.data_executie, t.tip_tranzactie, t.suma, 
                    t.iban_sursa, cs.nume AS nume_sursa, cs.prenume AS prenume_sursa,
                    t.iban_destinatie, cd.nume AS nume_dest, cd.prenume AS prenume_dest
             FROM tranzactie t
@@ -172,9 +172,9 @@ public class TranzactieService {
             """;
 
         if (nrLuni != -1) {
-            sql += " AND t.timestamp >= ?";
+            sql += " AND t.data_executie >= ?";
         }
-        sql += " ORDER BY t.timestamp DESC";
+        sql += " ORDER BY t.data_executie DESC";
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -188,9 +188,9 @@ public class TranzactieService {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    String tip = rs.getString("tip");
+                    String tip = rs.getString("tip_tranzactie");
                     double suma = rs.getDouble("suma");
-                    String data = rs.getString("timestamp").substring(0, 16);
+                    String data = rs.getString("data_executie").substring(0, 16);
 
                     String detalii = "";
                     if (tip.equals("TRANSFER")) {
@@ -279,11 +279,11 @@ public class TranzactieService {
         List<String> contacte = new ArrayList<>();
 
         String sql = """
-            SELECT cd.nume, cd.prenume, cb.iban, COUNT(t.id) AS frecventa, SUM(t.suma) AS total_trimis
+            SELECT cd.nume, cd.prenume, cb.iban, COUNT(t.id_tranzactie) AS frecventa, SUM(t.suma) AS total_trimis
             FROM tranzactie t
             JOIN cont_bancar cb ON t.iban_destinatie = cb.iban
             JOIN client cd ON cb.client_id = cd.id
-            WHERE t.iban_sursa = ? AND t.tip = 'TRANSFER'
+            WHERE t.iban_sursa = ? AND t.tip_tranzactie = 'TRANSFER'
             GROUP BY cd.id, cd.nume, cd.prenume, cb.iban
             ORDER BY frecventa DESC, total_trimis DESC
             LIMIT 5

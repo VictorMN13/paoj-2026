@@ -277,11 +277,11 @@ public class ContService {
     public List<String> obtineTopClientiTransferuri() {
         List<String> topClienti = new ArrayList<>();
         String sql = """
-            SELECT u.nume, u.prenume, COUNT(t.id) AS numar_transferuri, SUM(t.suma) AS volum_total
+            SELECT u.nume, u.prenume, COUNT(t.id_tranzactie) AS numar_transferuri, SUM(t.suma) AS volum_total
             FROM client u
             JOIN cont_bancar cb ON u.id = cb.client_id
             JOIN tranzactie t ON cb.iban = t.iban_sursa
-            WHERE t.tip = 'TRANSFER'
+            WHERE t.tip_tranzactie = 'TRANSFER'
             GROUP BY u.id, u.nume, u.prenume
             ORDER BY volum_total DESC
             LIMIT 5

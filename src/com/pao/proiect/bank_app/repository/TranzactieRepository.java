@@ -18,20 +18,20 @@ public class TranzactieRepository implements Repository<Tranzactie, String> {
     }
 
     private Tranzactie mapRow(ResultSet rs) throws SQLException {
-        String id = rs.getString("id");
+        String id = rs.getString("id_tranzactie");
         String ibanSursa = rs.getString("iban_sursa");
         String ibanDestinatie = rs.getString("iban_destinatie");
         double suma = rs.getDouble("suma");
         TipTranzactie tip = TipTranzactie.valueOf(rs.getString("tip_tranzactie"));
 
-        LocalDateTime dataTimp = rs.getTimestamp("data_timp").toLocalDateTime();
+        LocalDateTime dataTimp = rs.getTimestamp("data_executie").toLocalDateTime();
 
         return new Tranzactie(id, dataTimp, suma, tip, ibanSursa, ibanDestinatie);
     }
 
     @Override
     public void save(Tranzactie tranzactie) throws SQLException {
-        String sql = "INSERT INTO tranzactie (id, iban_sursa, iban_destinatie, suma, tip_tranzactie, data_timp) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tranzactie (id_tranzactie, iban_sursa, iban_destinatie, suma, tip_tranzactie, data_executie) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, tranzactie.idTranzactie());
             ps.setString(2, tranzactie.ibanSursa());
@@ -48,7 +48,7 @@ public class TranzactieRepository implements Repository<Tranzactie, String> {
 
     @Override
     public Optional<Tranzactie> findById(String id) throws SQLException {
-        String sql = "SELECT id, iban_sursa, iban_destinatie, suma, tip_tranzactie, data_timp FROM tranzactie WHERE id = ?";
+        String sql = "SELECT id_tranzactie, iban_sursa, iban_destinatie, suma, tip_tranzactie, data_executie FROM tranzactie WHERE id = ?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -62,7 +62,7 @@ public class TranzactieRepository implements Repository<Tranzactie, String> {
 
     @Override
     public List<Tranzactie> findAll() throws SQLException {
-        String sql = "SELECT id, iban_sursa, iban_destinatie, suma, tip_tranzactie, data_timp FROM tranzactie ORDER BY data_timp DESC";
+        String sql = "SELECT id_tranzactie, iban_sursa, iban_destinatie, suma, tip_tranzactie, data_executie FROM tranzactie ORDER BY data_executie DESC";
         List<Tranzactie> list = new ArrayList<>();
         try (PreparedStatement ps = getConn().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
